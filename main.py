@@ -84,18 +84,20 @@ def end_game(plr_win):
         pyray.draw_rectangle(100, 100, 100, 100, colors.BLUE)
 
 
+
+
 def main():
     #сцена
     plr_win = ""
     scene = "game"
+    window_width, window_height = 1050, 450
 
     # объекты
-    player1 = Player(0, 135, 20, 135, colors.BLUE, 2)
-    player2 = Player(980, 135, 20, 135, colors.RED, 2)
-    ball = Ball(480, 180, 20, 20, colors.WHITE, random.choice([-4, 4]), random.choice([-2, 2]))
+    player1 = Player(20, 135, 20, 135, colors.BLUE, 2)
+    player2 = Player(window_width - 40, 135, 20, 135, colors.RED, 2)
+    ball = Ball(window_width // 2 - 20, 180, 20, 20, colors.WHITE, random.choice([-4, 4]), random.choice([-2, 2]))
 
     #окно
-    window_width, window_height = 1000, 400
     pyray.init_window(window_width, window_height, 'PingPong')
     pyray.set_target_fps(60)
 
@@ -119,9 +121,11 @@ def main():
                 ball.bounce()
                 if ball.shift_x > 0:
                     ball.shift_x += 1
+                    ball.shift_y += random.randint(-5, 5)
                 else:
                     ball.shift_x -= 1
-             
+                    ball.shift_y += random.randint(-5, 5)
+
             #конец игры
             if ball.collide_with_horizontal_border(window_width):
                 scene = "end_game"
