@@ -1,38 +1,48 @@
 import socket
 import threading
 import time
+import json
 
 host = "0.0.0.0"
 
-def accessNewClients(server):
-    global users
-    while True:
-        user, adress = server.accept()
-        ip = str(adress).replace("(","").replace(")","").replace("'","").split(",")[0]
-        users[user] = ip
-        user.send( ("Server: Hi "+ip+", we are connected!").encode("utf-8"))
-        threading.Thread(target=receive, args=(user,), daemon=True).start()
+'''
+Packets
+CONNECTION;name
+CREATE;uid;password
+JOIN;uid;password
+'''
 
-def receive(user):
+
+def receive(client):
     while True:
-        data = user.recv(1024)
+        data = client.recv(1024).decode("utf-8")
+        print(data)
         
 
 def start_client(host: str, port: int):
+    
+    name = input().replace(';',"")
+    packet = "CONNECTION;"+str(name)
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client.connect((host, port))
-    threading.Thread(target=receive, args=(client,), daemon=True).start()
-    client.send("I am connected!".encode("utf-8"))
+    client.send(packet.encode("utf-8"))
+    rooms = client.recv(1024).decode("utf-8")
+    if rooms == "": print("No rooms available")
+    else: print(rooms)
+    threading.Thread(target=receive, args=(client,), daemon=False).start()
+    #print(client.recv(1024).decode("utf-8"))
     while True:
-        client.send(input().encode("utf-8"))
+        packet=input()
+        client.send(packet.encode("utf-8"))
+    #packet = "CREATE;"
+    #client.send(packet.encode("utf-8"))
+    #while True:
+    #    client.send(input().encode("utf-8"))
 
-{
-  "packet": {
-    "type": "CONNECTION",
-    "message": "LOGIN"
-  }
-}
+
+    
+
 
 
 if __name__ == "__main__":
-    start_client(host, 34543)
+    start_client("127.0.0.1", 34543)
